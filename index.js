@@ -5,6 +5,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.get("/", (req, res) => {
   res.status(200).json({
     slackUsername: "Masud_Ndatsu",
@@ -16,48 +17,57 @@ app.get("/", (req, res) => {
 
 // HNG TASK TWO
 app.post("/api/operation", (req, res) => {
-  let result;
-  const opts = {
-    ADDITION: "addition",
-    SUBSTRACTION: "substraction",
-    MULTIPLICATION: "multiplication",
-  };
-  const { operation_type, x, y } = req.body;
+  try {
+    let result = 0;
+    const validEnums = ["addition", "subtraction", "multiplication"];
 
-  let num1 = Number(x),
-    num2 = Number(y);
+    const { operation_type, x, y } = req.body;
 
-  switch (operation_type) {
-    case opts.ADDITION:
-      result = num1 + num2;
-      result = {
-        result,
-        operation_type: opts.ADDITION,
-      };
-      break;
-    case opts.SUBSTRACTION:
-      result = Math.abs(num1 - num2);
-      result = {
-        result,
-        operation_type: opts.SUBSTRACTION,
-      };
-      break;
-    case opts.MULTIPLICATION:
-      result = num1 * num2;
-      result = {
-        result,
-        operation_type: opts.MULTIPLICATION,
-      };
-      break;
-    default:
-      return;
+    const isNotANumber = (param) => {
+      return isNaN(parseInt(param));
+    };
+
+    const sendData = (code) => {
+      if (code === 200) {
+        return res
+          .status(code)
+          .json({ slackUsername: "Masud_Ndatsu", result, operation_type });
+      }
+      return res.status(code).json({
+        result: "Invalid Input Format",
+        operation_type,
+      });
+    };
+
+    if (
+      isNotANumber(x) ||
+      isNotANumber(y) ||
+      !validEnums.includes(operation_type)
+    ) {
+      return sendData(403);
+    }
+
+    console.log(req.body);
+
+    if (
+      validEnums.includes(operation_type) &&
+      !isNotANumber(x) &&
+      !isNotANumber(y)
+    ) {
+      result =
+        operation_type === "addition"
+          ? parseInt(x) + parseInt(y)
+          : operation_type === "subtraction"
+          ? parseInt(x) - parseInt(y)
+          : operation_type === "multiplication"
+          ? parseInt(x) * parseInt(y)
+          : result;
+    }
+
+    return sendData(200);
+  } catch (error) {
+    return res.status(500).json({ error });
   }
-
-  return res.status(200).json({
-    slackUsername: "Masud_Ndatsu",
-    result: result.result,
-    operation_type: result.operation_type,
-  });
 });
 
 const port = process.env.PORT || 3000;
