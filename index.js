@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 });
 
 // HNG TASK TWO
-app.post("/api/operation", (req, res) => {
+app.post("/compute", (req, res) => {
   try {
     let result = 0;
     const validEnums = ["addition", "subtraction", "multiplication"];
@@ -27,7 +27,7 @@ app.post("/api/operation", (req, res) => {
       return isNaN(parseInt(param));
     };
 
-    const sendData = (code) => {
+    const sendData = (code = 200) => {
       if (code === 200) {
         return res.status(code).json({
           slackUsername: "Masud_Ndatsu",
@@ -59,7 +59,7 @@ app.post("/api/operation", (req, res) => {
 
     return sendData(200);
   } catch (error) {
-    return res.status(500).json({ error });
+    return sendData(500);
   }
 });
 
