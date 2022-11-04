@@ -29,25 +29,18 @@ app.post("/api/operation", (req, res) => {
 
     const sendData = (code) => {
       if (code === 200) {
-        return res
-          .status(code)
-          .json({ slackUsername: "Masud_Ndatsu", result, operation_type });
+        return res.status(code).json({
+          slackUsername: "Masud_Ndatsu",
+          result,
+          operation_type,
+        });
       }
       return res.status(code).json({
-        result: "Invalid Input Format",
-        operation_type,
+        slackUsername: "Masud_Ndatsu",
+        operation_type: "Invalid operation type or value",
+        result,
       });
     };
-
-    if (
-      isNotANumber(x) ||
-      isNotANumber(y) ||
-      !validEnums.includes(operation_type)
-    ) {
-      return sendData(403);
-    }
-
-    console.log(req.body);
 
     if (
       validEnums.includes(operation_type) &&
